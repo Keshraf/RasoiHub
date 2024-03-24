@@ -37,9 +37,7 @@ model Recipe {
 }
 
 model Ingredient {
-  id              String               @id @default(uuid())
-  name            String            @db.VarChar(255)
-  unit            String            @db.VarChar(50)
+  name            String            @db.VarChar(255) @unique
   recipeIngredients RecipeIngredient[]
   inventories     Inventory[]
   createdAt  DateTime    @default(now())
@@ -50,8 +48,8 @@ model RecipeIngredient {
   id           String        @id @default(uuid())
   recipe       Recipe     @relation(fields: [recipeId], references: [id])
   recipeId     String
-  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
-  ingredientId String
+  ingredient   Ingredient @relation(fields: [ingredientName], references: [name])
+  ingredientName String
   quantity     Decimal    @db.Decimal(10, 2)
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
@@ -84,8 +82,8 @@ model Inventory {
   id           String        @id @default(uuid())
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
   restaurantId String
-  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
-  ingredientId String
+  ingredient   Ingredient @relation(fields: [ingredientName], references: [name])
+  ingredientName String
   quantity     Decimal    @db.Decimal(10, 2)
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt

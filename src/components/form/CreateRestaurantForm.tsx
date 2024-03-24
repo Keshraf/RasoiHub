@@ -37,7 +37,7 @@ const CreateRestaurantForm = () => {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      createRestaurant.mutate(values);
+      await createRestaurant.mutateAsync(values);
       toast.success("Restaurant created successfully.");
     } catch (error) {
       toast.error("An error occurred. Please try again.");

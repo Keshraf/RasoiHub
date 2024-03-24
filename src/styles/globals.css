@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.mantine-Autocomplete-dropdown {
+  z-index: 999999999999;
+}
+
+.mantine-Autocomplete-options {
+  z-index: 999999999999;
+}
+.mantine-Autocomplete-option {
+  z-index: 999999999999;
+}
