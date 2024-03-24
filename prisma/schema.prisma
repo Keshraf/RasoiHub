@@ -6,15 +6,110 @@ generator client {
 }
 
 datasource db {
-    provider = "sqlite"
+    provider = "postgresql"
     url      = env("DATABASE_URL")
 }
+model Restaurant {
+  id         String         @id @default(uuid())
+  name       String      @db.VarChar(255)
+  address    String      @db.VarChar(255)
+  phone      String      @db.VarChar(10)
+  email      String      @db.VarChar(255)
+  admins     Admin[]
+  employees  Employee[]
+  recipes    Recipe[]
+  orders     Order[]
+  inventories Inventory[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model Admin {
+  id           String        @id @default(uuid())
+  restaurant   Restaurant? @relation(fields: [restaurantId], references: [id])
+  restaurantId String?
+  name         String     @db.VarChar(255)
+  email        String     @db.VarChar(255)
+  clerkUserId  String     @unique
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
 
-    @@index([name])
+model Employee {
+  id           String        @id @default(uuid())
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId String
+  name         String     @db.VarChar(255)
+  email        String     @db.VarChar(255)
+  password     String     @db.VarChar(255)
+  role         String     @db.VarChar(50)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model Recipe {
+  id           String              @id @default(uuid())
+  restaurant   Restaurant       @relation(fields: [restaurantId], references: [id])
+  restaurantId String
+  name         String           @db.VarChar(255)
+  description  String           @db.Text
+  ingredients  RecipeIngredient[]
+  orderItems   OrderItem[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model Ingredient {
+  id              String               @id @default(uuid())
+  name            String            @db.VarChar(255)
+  unit            String            @db.VarChar(50)
+  recipeIngredients RecipeIngredient[]
+  inventories     Inventory[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model RecipeIngredient {
+  id           String        @id @default(uuid())
+  recipe       Recipe     @relation(fields: [recipeId], references: [id])
+  recipeId     String
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+  ingredientId String
+  quantity     Decimal    @db.Decimal(10, 2)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model Order {
+  id           String        @id @default(uuid())
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId String
+  customerName String     @db.VarChar(255)
+  orderDate    DateTime   
+  status       String     @db.VarChar(50)
+  items        OrderItem[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model OrderItem {
+  id        String     @id @default(uuid())
+  order     Order   @relation(fields: [orderId], references: [id])
+  orderId   String
+  recipe    Recipe  @relation(fields: [recipeId], references: [id])
+  recipeId  String
+  quantity  Int
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model Inventory {
+  id           String        @id @default(uuid())
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId String
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+  ingredientId String
+  quantity     Decimal    @db.Decimal(10, 2)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
 }
