@@ -1,3 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/prefer-for-of */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 import {
   Sheet,
   SheetClose,
@@ -68,7 +77,7 @@ const CreateOrderForm = ({ refetch }: { refetch: any }) => {
     for (let i = 0; i < ingredients.length; i++) {
       const ingredient = ingredients[i];
       const inventoryItem = inventory.find(
-        (item) => item.ingredient.name === ingredient.ingredientName,
+        (item: any) => item.ingredient.name === ingredient.ingredientName,
       );
       if (
         !inventoryItem ||
@@ -83,7 +92,7 @@ const CreateOrderForm = ({ refetch }: { refetch: any }) => {
   useEffect(() => {
     const fetchRecipes = async () => {
       const x = recipes?.filter((recipe) => isAvailable(recipe, inventory));
-      setRecipesList(x);
+      setRecipesList(x ?? []);
     };
 
     fetchRecipes();

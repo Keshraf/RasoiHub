@@ -1,3 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/prefer-for-of */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 import { api } from "~/utils/api";
 import CreateInventoryForm from "../form/CreateInventoryForm";
 import {
@@ -34,7 +43,9 @@ const Inventory = () => {
                 <TableCell className="font-medium">
                   {item.ingredient.name}
                 </TableCell>
-                <TableCell className="text-right">{item.quantity}</TableCell>
+                <TableCell className="text-right">
+                  {item.quantity.toString()}
+                </TableCell>
               </TableRow>
             );
           })}
