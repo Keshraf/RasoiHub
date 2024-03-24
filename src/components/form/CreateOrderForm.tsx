@@ -13,7 +13,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Autocomplete, FileInput } from "@mantine/core";
 import { getIngredients } from "~/utils/ingredient";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "~/utils/api";
 import { Textarea } from "../ui/textarea";
 import { supabase } from "~/utils/supabase";
@@ -26,58 +26,83 @@ type Ing = {
   num: number;
 };
 
-const CreateRecipeForm = ({ refetch }: { refetch: any }) => {
+const CreateOrderForm = ({ refetch }: { refetch: any }) => {
+  const { data: recipes, isLoading: recipesIsLoading } =
+    api.recipe.get.useQuery();
+  const { data: inventory, isLoading: inventoryIsLoading } =
+    api.inventory.get.useQuery();
+
   const [name, setName] = useState<string>("");
+  const [status, setStatus] = useState<string>("");
   const [file, setFile] = useState<File | null>();
   const [desc, setDesc] = useState<string>("");
   const [value, setValue] = useState<string>("");
   const [price, setPrice] = useState<number>(0);
   const [num, setNum] = useState<number>(0);
   const [ingList, setIngList] = useState<Ing[]>([]);
-  const createRecipe = api.recipe.create.useMutation();
+  const createInventory = api.inventory.create.useMutation();
+  const createOrder = api.order.create.useMutation();
   const { userId } = useAuth();
 
-  const handleUpload = async () => {
-    const recipeImage = ref(storage, `recipe/${name}-${userId}`);
-
-    if (!file) return;
-    await uploadBytes(recipeImage, file).then((snapshot) => {
-      console.log("Uploaded a blob or file!");
-    });
-  };
+  const [recipesList, setRecipesList] = useState<any[]>([]);
 
   const submit = async () => {
-    await createRecipe.mutateAsync({
+    const orderItems = ingList.map((ing) => ({
+      id: recipesList.find((recipe) => recipe.name === ing.name).id,
+      name: ing.name,
+      quantity: ing.num,
+    }));
+
+    await createOrder.mutateAsync({
       name,
-      description: desc,
-      price,
-      ingredients: ingList.map((ing) => ({
-        name: ing.name,
-        quantity: ing.num,
-      })),
+      status,
+      items: orderItems,
+      date: new Date(),
     });
-    await handleUpload();
+
     refetch();
   };
+
+  function isAvailable(recipe: any, inventory: any) {
+    const ingredients = recipe.ingredients;
+    for (let i = 0; i < ingredients.length; i++) {
+      const ingredient = ingredients[i];
+      const inventoryItem = inventory.find(
+        (item) => item.ingredient.name === ingredient.ingredientName,
+      );
+      if (
+        !inventoryItem ||
+        parseInt(inventoryItem.quantity) < parseInt(ingredient.quantity)
+      ) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      const x = recipes?.filter((recipe) => isAvailable(recipe, inventory));
+      setRecipesList(x);
+    };
+
+    fetchRecipes();
+  }, []);
 
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline">Add Recipe +</Button>
+        <Button variant="outline">Add Order +</Button>
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Add Recipe</SheetTitle>
-          <SheetDescription>
-            {
-              " Create your recipe here by adding all the ingredients by measurement."
-            }
-          </SheetDescription>
+          <SheetTitle>Add Order</SheetTitle>
+          {/* <SheetDescription>{" Place Order"}</SheetDescription> */}
         </SheetHeader>
         <div className="flex w-full flex-col items-start justify-start gap-4 py-4">
           <div className="flex w-full flex-col items-start justify-start gap-2">
             <Label htmlFor="name" className="text-right">
-              Recipe Name
+              Customer Name
             </Label>
             <Input
               id="name"
@@ -87,36 +112,18 @@ const CreateRecipeForm = ({ refetch }: { refetch: any }) => {
             />
           </div>
           <div className="flex w-full flex-col items-start justify-start gap-2">
-            <Label htmlFor="cost" className="text-right">
-              Cost of Dish
+            <Label htmlFor="name" className="text-right">
+              Status
             </Label>
             <Input
-              id="cost"
+              id="status"
               className="col-span-3"
-              value={price}
-              onChange={(e) =>
-                setPrice(Number(e.target.value == "" ? "0" : e.target.value))
-              }
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
             />
-          </div>
-          <div className="flex w-full flex-col items-start justify-start gap-2">
-            <Label htmlFor="desc" className="text-right">
-              Description
-            </Label>
-            <Textarea
-              className="col-span-3"
-              value={desc}
-              onChange={(e) => setDesc(e.target.value)}
-            />
-          </div>
-          <div className="flex w-full flex-col items-start justify-start gap-2">
-            <Label htmlFor="desc" className="text-right">
-              Image Upload
-            </Label>
-            <FileInput onChange={(e) => setFile(e)} />
           </div>
           <Label htmlFor="" className="text-right">
-            Ingredients
+            Order
           </Label>
           <div className="flex w-full flex-row gap-1">
             <Autocomplete
@@ -126,14 +133,16 @@ const CreateRecipeForm = ({ refetch }: { refetch: any }) => {
               }}
               value={value}
               onChange={(value) => setValue(value)}
-              data={getIngredients(value)}
-              placeholder="Use Arrow Keys to Select Ingredients"
+              data={recipesList.map((recipe) => recipe.name)}
+              placeholder="Use Arrow Keys to Select Dishes"
             />
             <Input
               className="h-[36px] w-[75px]"
               id="num"
               value={num}
-              onChange={(e) => setNum(parseInt(e.target.value))}
+              onChange={(e) =>
+                setNum(parseInt(e.target.value == "" ? "0" : e.target.value))
+              }
             />
             <Button
               className="h-[36px]"
@@ -172,4 +181,4 @@ const CreateRecipeForm = ({ refetch }: { refetch: any }) => {
   );
 };
 
-export default CreateRecipeForm;
+export default CreateOrderForm;

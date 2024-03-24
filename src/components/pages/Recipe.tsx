@@ -30,6 +30,7 @@ const Recipe = () => {
     isLoading,
     isError,
     error,
+    refetch,
   } = api.recipe.get.useQuery();
 
   const { data: inventory } = api.inventory.get.useQuery();
@@ -72,7 +73,7 @@ const Recipe = () => {
     <section className="flex h-full w-full flex-col items-start justify-start gap-2">
       <div className="flex w-full flex-row  justify-between">
         <h2 className="text-xl font-bold">Recipe</h2>
-        <CreateRecipeForm />
+        <CreateRecipeForm refetch={refetch} />
       </div>
       <div className="flex w-full flex-row flex-wrap items-start justify-start gap-2">
         {recipes?.map((recipe, index) => {

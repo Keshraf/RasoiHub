@@ -26,7 +26,7 @@ type Ing = {
   num: number;
 };
 
-const CreateInventoryForm = () => {
+const CreateInventoryForm = ({ refetch }: { refetch: any }) => {
   const [name, setName] = useState<string>("");
   const [file, setFile] = useState<File | null>();
   const [desc, setDesc] = useState<string>("");
@@ -44,6 +44,7 @@ const CreateInventoryForm = () => {
         quantity: ing.num,
       })),
     );
+    refetch();
   };
 
   return (
@@ -77,7 +78,9 @@ const CreateInventoryForm = () => {
               className="h-[36px] w-[75px]"
               id="num"
               value={num}
-              onChange={(e) => setNum(parseInt(e.target.value))}
+              onChange={(e) =>
+                setNum(parseInt(e.target.value == "" ? "0" : e.target.value))
+              }
             />
             <Button
               className="h-[36px]"

@@ -17,7 +17,7 @@ const Inventory = () => {
     <section className="flex h-full w-full flex-col items-start justify-start gap-2">
       <div className="flex w-full flex-row  justify-between">
         <h2 className="text-xl font-bold">Inventory</h2>
-        <CreateInventoryForm />
+        <CreateInventoryForm refetch={inventory.refetch} />
       </div>
       <Table>
         <TableCaption>A list of all your recent ingredients.</TableCaption>
