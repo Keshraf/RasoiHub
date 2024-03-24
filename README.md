@@ -1,29 +1,30 @@
-# Create T3 App
+## Inspiration
+Cloud kitchen is the fastest-growing business in the food and hospitality sector in India. Current management tools cater to physical restaurants and are not made to serve the unique challenges cloud kitchens face. We identified this gap in the market and plan to monetise on it.
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+## What it does
+It is an all-in-one management system that streamlines processes like inventory, sales, team, menu management, and more. We are currently the most comprehensive solution in the market.
 
-## What's next? How do I make an app with this?
+## How we built it
+We built it for scale while keeping our tech debt low by applying the most proven industry practices. Our Tech Stack:
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+1. NextJS - full-stack framework
+2. tRPC - typesafe end-to-end server framework
+3. Prisma - ORM
+4. Clerk - Authentication
+5. Postgres - Database
+6. Tailwind - CSS utility
+7. Zod - Validation
+8. RadixUI - Accessbile UI Components
+9. eslint, prettier, etc - linting & formatting
+    
+## Challenges we ran into
+Our project was too broad to finish in the given time. So, we had to work really hard to nail down one hero feature for our demo.
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+## Accomplishments that we're proud of
+We are proud to come up with a good solution to a genuine pain point that business owners face. We hope to continue our project past this hackathon.
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+## What we learned
+How effective Red Bull is for all-nighters, haha.
 
-## Learn More
-
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
-
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
-
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
-
-## How do I deploy this?
-
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+## What's next for RasoiHub
+We will go down our feature list and pitch our MVP to our friend's father, who owns a cloud kitchen in India.
