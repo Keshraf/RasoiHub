@@ -30,6 +30,7 @@ model Recipe {
   restaurantId String
   name         String           @db.VarChar(255)
   description  String           @db.Text
+  price        Decimal          @db.Decimal(10, 2)
   ingredients  RecipeIngredient[]
   orderItems   OrderItem[]
   createdAt  DateTime    @default(now())
@@ -37,7 +38,7 @@ model Recipe {
 }
 
 model Ingredient {
-  name            String            @db.VarChar(255) @unique
+  name            String            @db.VarChar(255) @unique @id
   recipeIngredients RecipeIngredient[]
   inventories     Inventory[]
   createdAt  DateTime    @default(now())

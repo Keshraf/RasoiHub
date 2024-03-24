@@ -3,11 +3,26 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const recipeRouter = createTRPCRouter({
+  get: protectedProcedure.query(async ({ ctx }) => {
+    const res = await ctx.db.recipe.findMany({
+      where: {
+        restaurant: {
+          clerkUserId: ctx.auth.userId,
+        },
+      },
+      include: {
+        ingredients: true,
+      },
+    });
+
+    return res;
+  }),
   create: protectedProcedure
     .input(
       z.object({
         name: z.string(),
         description: z.string(),
+        price: z.number(),
         ingredients: z.array(
           z.object({
             name: z.string(),
@@ -40,22 +55,12 @@ export const recipeRouter = createTRPCRouter({
             },
           },
           description: input.description,
+          price: input.price,
           ingredients: {
             createMany: {
               data: input.ingredients.map((ingredient) => ({
-                name: ingredient.name,
                 quantity: ingredient.quantity,
                 ingredientName: ingredient.name,
-                ingredient: {
-                  connectOrCreate: {
-                    where: {
-                      name: ingredient.name,
-                    },
-                    create: {
-                      name: ingredient.name,
-                    },
-                  },
-                },
               })),
             },
           },

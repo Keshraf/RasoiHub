@@ -11,9 +11,15 @@ import {
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { Autocomplete } from "@mantine/core";
+import { Autocomplete, FileInput } from "@mantine/core";
 import { getIngredients } from "~/utils/ingredient";
 import { useState } from "react";
+import { api } from "~/utils/api";
+import { Textarea } from "../ui/textarea";
+import { supabase } from "~/utils/supabase";
+import { storage } from "~/utils/firebase";
+import { ref, uploadBytes } from "firebase/storage";
+import { useAuth } from "@clerk/nextjs";
 
 type Ing = {
   name: string;
@@ -21,9 +27,37 @@ type Ing = {
 };
 
 const CreateRecipeForm = () => {
+  const [name, setName] = useState<string>("");
+  const [file, setFile] = useState<File | null>();
+  const [desc, setDesc] = useState<string>("");
   const [value, setValue] = useState<string>("");
+  const [price, setPrice] = useState<number>(0);
   const [num, setNum] = useState<number>(0);
   const [ingList, setIngList] = useState<Ing[]>([]);
+  const createRecipe = api.recipe.create.useMutation();
+  const { userId } = useAuth();
+
+  const handleUpload = async () => {
+    const recipeImage = ref(storage, `recipe/${name}-${userId}`);
+
+    if (!file) return;
+    await uploadBytes(recipeImage, file).then((snapshot) => {
+      console.log("Uploaded a blob or file!");
+    });
+  };
+
+  const submit = async () => {
+    await createRecipe.mutateAsync({
+      name,
+      description: desc,
+      price,
+      ingredients: ingList.map((ing) => ({
+        name: ing.name,
+        quantity: ing.num,
+      })),
+    });
+    await handleUpload();
+  };
 
   return (
     <Sheet>
@@ -44,7 +78,39 @@ const CreateRecipeForm = () => {
             <Label htmlFor="name" className="text-right">
               Recipe Name
             </Label>
-            <Input id="name" className="col-span-3" />
+            <Input
+              id="name"
+              className="col-span-3"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+          <div className="flex w-full flex-col items-start justify-start gap-2">
+            <Label htmlFor="cost" className="text-right">
+              Cost of Dish
+            </Label>
+            <Input
+              id="cost"
+              className="col-span-3"
+              value={price}
+              onChange={(e) => setPrice(Number(e.target.value))}
+            />
+          </div>
+          <div className="flex w-full flex-col items-start justify-start gap-2">
+            <Label htmlFor="desc" className="text-right">
+              Description
+            </Label>
+            <Textarea
+              className="col-span-3"
+              value={desc}
+              onChange={(e) => setDesc(e.target.value)}
+            />
+          </div>
+          <div className="flex w-full flex-col items-start justify-start gap-2">
+            <Label htmlFor="desc" className="text-right">
+              Image Upload
+            </Label>
+            <FileInput onChange={(e) => setFile(e)} />
           </div>
           <Label htmlFor="" className="text-right">
             Ingredients
@@ -93,7 +159,9 @@ const CreateRecipeForm = () => {
         </div>
         <SheetFooter>
           <SheetClose asChild>
-            <Button type="submit">Save changes</Button>
+            <Button type="submit" onClick={submit}>
+              Save changes
+            </Button>
           </SheetClose>
         </SheetFooter>
       </SheetContent>
